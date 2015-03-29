@@ -1,8 +1,11 @@
 // Playground - noun: a place where people can play
 
 import Cocoa
+import Foundation
 
-let expectedHashValue = 683122939450
+let expectedHashValue = 680131659347
+var counter = 0
+
 
 findStringForHashValue(expectedHashValue)
 
@@ -43,6 +46,8 @@ func findAllNLengthRec(characterSet: [Character], prefix: String, numberOfCharac
         var actualHashValue = hash(prefix)
         if (actualHashValue == expectedHashValue) {
             print("Success")
+            print(prefix)
+            exit(0)
         } else {
             print("Failure")
         }
