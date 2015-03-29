@@ -2,12 +2,14 @@
 
 import Cocoa
 
-
+let testString = "leepadg"
 let expectedHashValue = 680131659347
-var hashValue = hash("leepadg")
+var actualHashValue = hash(testString)
 
-if (hashValue == expectedHashValue) {
-    print(hashValue)
+if (actualHashValue == expectedHashValue) {
+    print("Success")
+} else {
+    print("Failure")
 }
 
 func hash(theString: String) -> Int {
