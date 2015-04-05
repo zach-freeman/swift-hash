@@ -4,23 +4,21 @@ import Foundation
 let expectedHashValue = 683122939450  //monster
 //let expectedHashValue = 664523346955  //aaageno
 let letters = "acdegilmnoprstuw"
-let characterSet = Array(letters)
-
-let uLetters = letters.utf8
-let uCharacterSet = Array(uLetters)
-let numberOfCharacters = count(characterSet)
+let codeUnitLetters = letters.utf8
+let codeUnitCharacterSet = Array(codeUnitLetters)
+let numberOfCharacters = count(codeUnitCharacterSet)
 
 func stringFromCodeUnit(codeUnit: [UInt8]) -> String {
     return String.fromCString(UnsafePointer<CChar>(codeUnit))!
 }
 
-func testThisString(stringRep : [UInt8]) -> Bool {
+func testThisCodeUnit(codeUnitArray : [UInt8]) -> Bool {
     var foundTheMagicString = false;
-    var actualHashValue = hash(stringRep)
+    var actualHashValue = hash(codeUnitArray)
     if (actualHashValue == expectedHashValue) {
         println("Success")
         println(actualHashValue)
-        var stringToTest = stringFromCodeUnit(stringRep)
+        var stringToTest = stringFromCodeUnit(codeUnitArray)
         println(stringToTest)
         foundTheMagicString = true
     }
@@ -29,12 +27,12 @@ func testThisString(stringRep : [UInt8]) -> Bool {
     return foundTheMagicString
 }
 
-func hash(stringRep : [UInt8]) -> Int {
+func hash(codeUnitArray : [UInt8]) -> Int {
     var h : Int = 7;
     let multiplier : Int = 37;
-    for var i=0; i < count(stringRep); i++ {
-        var currentCharacter = stringRep[i]
-        var letterIndexOfCurrentCharacter = find(uCharacterSet, currentCharacter)
+    for var i=0; i < count(codeUnitArray); i++ {
+        var currentCharacter = codeUnitArray[i]
+        var letterIndexOfCurrentCharacter = find(codeUnitCharacterSet, currentCharacter)
         h = h * multiplier + letterIndexOfCurrentCharacter!
     }
     return h;
@@ -57,7 +55,7 @@ func findAllNLengthRec(inout prefix: [UInt8], inout desiredLength: Int) -> Void{
 
     // Base case: n is 0, print prefix
     if (desiredLength == 0) {
-        var foundString = testThisString(prefix)
+        var foundString = testThisCodeUnit(prefix)
         if (foundString == true) {
             exit(0)
         }
@@ -71,7 +69,7 @@ func findAllNLengthRec(inout prefix: [UInt8], inout desiredLength: Int) -> Void{
         // Next character of input added
         var newPrefix = [UInt8]()
         newPrefix += prefix
-        newPrefix.append(uCharacterSet[i])
+        newPrefix.append(codeUnitCharacterSet[i])
         var newDesiredLength = desiredLength - 1
 
         // n is decreased, because we have added a new character
