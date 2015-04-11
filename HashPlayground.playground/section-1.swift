@@ -3,53 +3,63 @@
 import Cocoa
 import Foundation
 
-let expectedHashValue = 680131659347
-var counter = 0
+//let expectedHashValue = 683122939450  //monster
+let expectedHashValue = 664523346955  //aaageno
+let letters = "acdegilmnoprstuw"
+let codeUnitLetters = letters.utf8
+let codeUnitCharacterSet = Array(codeUnitLetters)
+let numberOfCharacters = count(codeUnitCharacterSet)
 
+func stringFromCodeUnit(codeUnit: [UInt8]) -> String {
+    return String.fromCString(UnsafePointer<CChar>(codeUnit))!
+}
 
-findStringForHashValue(expectedHashValue)
+func testThisCodeUnit(codeUnitArray : [UInt8]) -> Bool {
+    var foundTheMagicString = false;
+    var actualHashValue = hash(codeUnitArray)
+    if (actualHashValue == expectedHashValue) {
+        println("Success")
+        println(actualHashValue)
+        var stringToTest = stringFromCodeUnit(codeUnitArray)
+        println(stringToTest)
+        foundTheMagicString = true
+    }
+    
+    
+    return foundTheMagicString
+}
 
-
-func hash(theString: String) -> Int {
+func hash(codeUnitArray : [UInt8]) -> Int {
     var h : Int = 7;
     let multiplier : Int = 37;
-    let letters = "acdegilmnoprstuw"
-    for var i=0; i < countElements(theString); i++ {
-        let stringIndex = advance(letters.startIndex, i)
-        var characterToFind = theString[stringIndex];
-        if var characterIndex = find(letters, characterToFind) {
-            var characterPosition = distance(letters.startIndex, characterIndex)
-            h = h * multiplier + characterPosition
-        }
+    for var i=0; i < count(codeUnitArray); i++ {
+        var currentCharacter = codeUnitArray[i]
+        var letterIndexOfCurrentCharacter = find(codeUnitCharacterSet, currentCharacter)
+        h = h * multiplier + letterIndexOfCurrentCharacter!
     }
     return h;
 }
 
-func findStringForHashValue(hash: Int) -> Void {
-    let letters = "acdegilmnoprstuw"
-    var characterSet = Array(letters)
-    let desiredLength = 7
-    findAllNLength(characterSet, desiredLength)
+func findStringForExpectedHashValue() -> Void {
+    findAllNLength()
 }
 
 //  mainly a wrapper over recursive function printAllNLengthRec()
-func findAllNLength(characterSet: [Character], desiredLength: Int) -> Void {
-    var numberOfCharacters = countElements(characterSet)
-    findAllNLengthRec(characterSet, "", numberOfCharacters, desiredLength);
+func findAllNLength() -> Void {
+    var prefix = [UInt8]()
+    prefix += "".utf8
+    var desiredLength = 7
+    findAllNLengthRec(&prefix, &desiredLength);
 }
 
 // The main recursive method to print all possible strings of length n
-func findAllNLengthRec(characterSet: [Character], prefix: String, numberOfCharacters: Int, desiredLength: Int) -> Void{
+func findAllNLengthRec(inout prefix: [UInt8], inout desiredLength: Int) -> Void{
     
     // Base case: n is 0, print prefix
     if (desiredLength == 0) {
-        var actualHashValue = hash(prefix)
-        if (actualHashValue == expectedHashValue) {
-            print("Success")
-            print(prefix)
+        var foundString = testThisCodeUnit(prefix)
+        if (foundString == true) {
             exit(0)
-        } else {
-            print("Failure")
         }
         return;
     }
@@ -59,10 +69,16 @@ func findAllNLengthRec(characterSet: [Character], prefix: String, numberOfCharac
     for var i = 0; i < numberOfCharacters; ++i {
         
         // Next character of input added
-        var newPrefixIndex = advance(characterSet.startIndex, i)
-        var newPrefix = prefix + [characterSet[newPrefixIndex]];
+        var newPrefix = [UInt8]()
+        newPrefix += prefix
+        newPrefix.append(codeUnitCharacterSet[i])
+        var newDesiredLength = desiredLength - 1
         
         // n is decreased, because we have added a new character
-        findAllNLengthRec(characterSet, newPrefix, numberOfCharacters, desiredLength - 1);
+        findAllNLengthRec(&newPrefix, &newDesiredLength);
     }
 }
+
+
+
+findStringForExpectedHashValue()
